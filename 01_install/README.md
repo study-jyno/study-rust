@@ -4,7 +4,7 @@
 
 다음 단계들이 러스트 컴파일러의 최신 안정 버전을 설치합니다. 이 책에 나오는 모든 예제들과 출력들은 안정화된 *러스트 1.21.0을 사용*했습니다.
 
-### Linux와 macOS에서 Rustup 설치하기
+## Linux와 macOS에서 Rustup 설치하기
 
 만일 여러분들이 Linux 혹은 macOS를 사용중이라면, 터미널을 열고 다음 커멘드를 입력하세요:
 
@@ -28,7 +28,7 @@ rustc --version
 
 ---
 
-# Hello, World!
+## Hello, World!
 
 main.rs를 생성하고 hello, world 를 찍어보겠씁니다
 
@@ -41,15 +41,12 @@ fn main() {
 ```shell
 rustc main.rs
 ./main
-```
-
-```
 Hello, world!
 ```
 
 ---
 
-# 러스트 프로그램 해부하기
+## 러스트 프로그램 해부하기
 
 여러분의 “Hello, world!” 프로그램에서 어떤 일이 벌어졌는지를 상세하게 짚어보겠습니다. 여기 첫번째 퍼즐 조각이 있습니다:
 
@@ -95,7 +92,7 @@ main 함수 내부에는 다음과 같은 코드가 있습니다:
 
 ---
 
-# 컴파일과 실행은 개별적인 단계입니다
+## 컴파일과 실행은 개별적인 단계입니다
 
 여러분이 이제 막 새로 만든 프로그램을 실행했으므로, 이 과정의 각 단계를 검토해 봅시다.
 
@@ -128,7 +125,7 @@ main main.rs
 
 ---
 
-# Hello, Cargo!
+## Hello, Cargo!
 
 Cargo(카고)는 러스트의 빌드 시스템 및 패키지 매니저입니다
 대부분의 러스트인들이 이 도구를 이용하여 그들의 러스트 프로젝트를 관리하는데, 그 이유는
@@ -150,7 +147,7 @@ cargo --version
 
 버전 숫자가 보인다면, 가지고 있는 것입니다! command not found 같은 에러를 보게 된다면, 여러분이 설치한 방법에 대한 문서에서 Cargo를 개별적으로 어떻게 설치하는지 찾아보세요.
 
-# Cargo를 사용하여 프로젝트 생성하기
+## Cargo를 사용하여 프로젝트 생성하기
 
 Cargo를 사용하여 새 프로젝트를 만들고 우리의 원래 “Hello, world!” 프로젝트와 얼마나 차이가 나는지 살펴봅시다.
 여러분의 projects 디렉토리로 (혹은 여러분의 코드를 저장하기로 결정한 어느 곳이든) 이동하세요. 그 다음, 어떤 운영체제이든 상관없이 다음을 실행하세요:
@@ -230,7 +227,7 @@ Finished dev [unoptimized + debuginfo] target(s) in 2.85 secs
 여러분은 아래 커맨드를 통해 이 실행 파일을 실행할 수 있습니다:
 
 ```shell
-./target/debug/hello_cargo # or .\target\debug\hello_cargo.exe on Windows
+./target/debug/hello_cargo ## or .\target\debug\hello_cargo.exe on Windows
 Hello, world!
 ```
 
@@ -282,7 +279,7 @@ Finished dev [unoptimized + debuginfo] target(s) in 0.32 secs
 - Cargo를 사용하면 생기는 추가적인 장점은 여러분이 어떠한 운영체제로 작업을 하든 상관없이 커맨드들이 동일하다는 점입니다.
   - 따라서 이러한 점 때문에 우리는 더 이상 Linux와 macOS 및 Windows를 위한 특정 명령을 제공하지 않을 것입니다.
 
-# 릴리즈 빌드
+## 릴리즈 빌드
 
 여러분의 프로젝트가 마침내 배포(릴리즈)를 위한 준비가 되었다면, cargo build --release를 사용하여 최적화와 함께 이를 컴파일할 수 있습니다.
 이 커맨드는 target/debug 대신 target/release에 실행파일을 생성할 것입니다.
@@ -294,7 +291,7 @@ Finished dev [unoptimized + debuginfo] target(s) in 0.32 secs
 
 만일 여러분이 코드의 실행 시간을 벤치마킹 중이라면, *cargo build --release*를 실행하고 *target/release*의 실행파일을 가지고 밴치마킹하고 있음을 확인하세요.
 
-# 관례로서의 Cargo
+## 관례로서의 Cargo
 
 단순한 프로젝트와 함께 Cargo를 사용하는 것은 그냥 rustc을 이용하는 것에 비해 큰 가치를 제공해주지는 못합니다만,
 여러분의 프로그램이 점점 더 복잡해질수록 Cargo는 자신의 가치를 증명할 것입니다.
@@ -314,7 +311,7 @@ cargo build
 
 Cargo에 대해 더 많은 정보를 보려면 문서를 참고하세요.
 
-# 정리
+## 정리
 
 여러분은 이미 여러분의 러스트 여정에서 아주 좋은 출발을 하고 있습니다! 이 장에서는 아래 항목들을 어떻게 하는지에 대해 배웠습니다:
 
