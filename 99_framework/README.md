@@ -81,3 +81,8 @@ Hello world!
 ```
 
 성공했다!
+
+4. test 어떻게 함?
+
+- https://actix.rs/docs/testing#unit-tests
+- test code 에서 hello 함수 어떻게 호출함? - 처음부터 다시봐야겠다

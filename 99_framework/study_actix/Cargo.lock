@@ -447,13 +447,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "framwork"
-version = "0.1.0"
-dependencies = [
- "actix-web",
-]
-
-[[package]]
 name = "futures-core"
 version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -961,6 +954,13 @@ checksum = "2538b18701741680e0322a2302176d3253a35388e2e62f172f64f4f16605f877"
 dependencies = [
  "libc",
  "windows-sys",
+]
+
+[[package]]
+name = "study_actix"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
 ]
 
 [[package]]
