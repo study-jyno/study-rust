@@ -281,4 +281,562 @@ index out of bounds: the len is 5 but the index is 10
 
 # 함수
 
-...
+여러분은 이미 이 언어에서 가장 중요한 함수 중 하나를 보셨습니다: 바로 많은 프로그램의 시작점인 main 함수를 말이죠. 또한 새로운 함수를 선언하도록 해주는 fn 키워드도 보셨습니다.
+
+
+러스트 코드는 함수나 변수 이름을 위한 관례로 스네이크 케이스 (snake case) 방식을 이용
+
+```rs
+fn main() {
+    println!("Hello, world!");
+
+    another_function();
+}
+
+fn another_function() {
+    println!("Another function.");
+}
+```
+
+소스 코드 내에서 another_function이 main 함수 이후에 정의되어 있다는 점을 주목하세요.
+
+이 함수를 main 함수 앞에서 정의할 수도 있습니다.
+
+러스트는 여러분의 함수 위치를 고려하지 않으며, 호출하는 쪽에서 볼 수 있는 스코프 어딘가에 정의만 되어있으면 됩니다.
+
+## 매개변수
+
+함수는 매개변수 (parameter) 를 갖도록 정의될 수 있으며, 이는 함수 시그니처 (function signiture) 의 일부인 특별한 변수입니다
+
+
+**함수 시그니처에서는 각 매개변수의 타입을 반드시 선언해야 합니다.**
+
+**이는 러스트를 설계하면서 신중하게 내린 결정 사항입니다:**
+
+1. 함수의 정의에 타입 명시를 강제하면 이 함수를 다른 코드에서 사용할 때 여러분이 의도한 타입을 컴파일러가 추측하지 않아도 되게 됩니다.
+2. 컴파일러는 또한 함수가 기대한 타입이 무엇인지 알고 있으면 더욱 유용한 에러 메시지를 제공할 수 있습니다.
+
+## 구문과 표현식
+
+함수 본문은 필요에 따라 `표현식 (expression)` 으로 끝나는 `구문 (statement)` 의 나열로 구성됩니다
+
+러스트는 표현식 기반의 언어이므로, 구문과 표현식의 구분은 러스트를 이해하는데 중요합니다
+
+다른 언어들은 이런 구분이 없으므로, 구문과 표현식이 무엇이며 둘 간의 차이가 함수의 본문에 어떤 영향을 주는지 살펴보겠습니다.
+
+- 구문은 어떤 동작을 수행하고 값을 반환하지 않는 명령입니다.
+- 표현식은 결괏값을 평가합니다. 몇 가지 예제를 살펴봅시다.
+
+
+우리는 실제로는 이미 구문과 표현식을 사용해 봤습니다.
+
+let 키워드로 변수를 만들고 값을 할당하는 것은 구문입니다. 예제 3-1의 let y = 6;은 구문입니다:
+```rs
+fn main() {
+    let y = 6;
+}
+```
+
+또한 함수 정의도 구문입니다; 위 예제는 그 자체로 구문에 해당됩니다.
+
+
+구문은 값을 반환하지 않습니다. 따라서 아래와 같이 let 구문을 다른 변수에 할당하려고 하면 에러가 납니다:
+```rs
+fn main() {
+    let x = (let y = 6);
+}
+```
+
+```shell
+$ cargo run
+   Compiling functions v0.1.0 (file:///projects/functions)
+error: expected expression, found `let` statement
+ --> src/main.rs:2:14
+  |
+2 |     let x = (let y = 6);
+  |              ^^^
+
+error: expected expression, found statement (`let`)
+ --> src/main.rs:2:14
+  |
+2 |     let x = (let y = 6);
+  |              ^^^^^^^^^
+  |
+  = note: variable declaration using `let` is a statement
+
+error[E0658]: `let` expressions in this position are unstable
+ --> src/main.rs:2:14
+  |
+2 |     let x = (let y = 6);
+  |              ^^^^^^^^^
+  |
+  = note: see issue #53667 <https://github.com/rust-lang/rust/issues/53667> for more information
+
+warning: unnecessary parentheses around assigned value
+ --> src/main.rs:2:13
+  |
+2 |     let x = (let y = 6);
+  |             ^         ^
+  |
+  = note: `#[warn(unused_parens)]` on by default
+help: remove these parentheses
+  |
+2 -     let x = (let y = 6);
+2 +     let x = let y = 6;
+  |
+
+For more information about this error, try `rustc --explain E0658`.
+warning: `functions` (bin "functions") generated 1 warning
+error: could not compile `functions` due to 3 previous errors; 1 warning emitted
+
+```
+
+let y = 6 구문은 값을 반환하지 않으므로 x에 바인딩시킬 것이 없습니다.
+
+이것이 C나 Ruby 같은 다른 언어와의 차이점인데, 이 언어들은 할당문이 할당된 값을 반환하죠.
+
+이런 언어들에서는 x = y = 6라고 작성하여 x와 y에 모두 6을 대입할 수 있지만, 러스트에서는 그렇지 않습니다.
+
+여러분이 작성하는 러스트 코드의 대부분은 표현식이며, 이는 어떤 값을 평가합니다.
+
+5 + 6과 같은 간단한 수학 연산을 살펴봅시다.
+
+이 수식은 11이라는 값을 평가하는 표현식입니다. 표현식은 구문의 일부일 수 있습니다:
+
+예제 3-1의 let y = 6;이라는 구문에서 6은 6이라는 값을 평가하는 표현식입니다.
+
+함수를 호출하는 것도, 매크로를 호출하는 것도 표현식입니다. 아래 예제처럼 중괄호로 만들어진 새로운 스코프 블록도 표현식입니다:
+
+```rs
+fn main() {
+    let y = {
+        let x = 3;
+        x + 1
+    };
+
+    println!("The value of y is: {y}");
+}
+```
+
+
+같은 경우에는 4를 평가하는 코드 블록입니다.
+
+이 값이 let 구문의 일부로서 y에 바인딩됩니다.
+
+여러분이 지금까지 봐온 것과 다르게 x + 1 줄의 마지막이 세미콜론으로 끝나지 않은 점을 주목하세요.
+
+표현식은 종결을 나타내는 세미콜론을 쓰지 않습니다.
+
+만약 표현식 끝에 세미콜론을 추가하면, 표현식은 구문으로 변경되고 값을 반환하지 않게 됩니다.
+
+이 점을 상기하면서 이후부터 함수의 반환 값과 표현식을 살펴보길 바랍니다.
+
+## 매개변수
+
+함수는 호출한 코드에 값을 반환할 수 있습니다.
+
+반환되는 값을 명명해야 할 필요는 없지만, 그 값의 타입은 화살표 (->) 뒤에 선언되어야 합니다. 러스트에서 함수의 반환 값은 함수 본문의 마지막 표현식의 값과 동일합니다
+
+```rs
+fn five() -> i32 {
+    5
+}
+
+fn main() {
+    let x = five();
+
+    println!("The value of x is: {x}");
+}
+```
+
+
+```rs
+fn main() {
+    let x = plus_one(5);
+
+    println!("The value of x is: {x}");
+}
+
+fn plus_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+이 코드를 실행하면 The value of x is: 6이 출력됩니다. 만일 x + 1 끝에 세미콜론이 추가되어 표현식이 구문으로 변경되면 에러가 발생합니다:
+
+```rs
+// This code does not compile!
+fn main() {
+    let x = plus_one(5);
+
+    println!("The value of x is: {x}");
+}
+
+fn plus_one(x: i32) -> i32 {
+    x + 1;
+}
+```
+
+이 코드를 컴파일하면 다음과 같은 에러가 나타납니다:
+
+```shell
+$ cargo run
+   Compiling functions v0.1.0 (file:///projects/functions)
+error[E0308]: mismatched types
+ --> src/main.rs:7:24
+  |
+7 | fn plus_one(x: i32) -> i32 {
+  |    --------            ^^^ expected `i32`, found `()`
+  |    |
+  |    implicitly returns `()` as its body has no tail or `return` expression
+8 |     x + 1;
+  |          - help: remove this semicolon to return this value
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `functions` due to previous error
+```
+
+주 에러 메시지 mismatched types는 이 코드의 핵심 문제를 보여줍니다.
+
+plus_one 함수의 정의에는 i32 값을 반환한다고 되어 있지만, 구문은 값을 평가하지 않기에 `()로 표현되는 유닛` 타입으로 표현됩니다.
+
+따라서 아무것도 반환되지 않아 함수가 정의된 내용과 상충하게 되어 에러가 발생됩니다.
+
+위의 출력 결과에서 러스트는 이 문제를 바로잡는데 도움이 될 수 있는 메시지를 제공합니다: 바로 세미콜론을 제거하면 에러가 수정될 것이란 제안이지요.
+
+
+# 제어 흐름문
+
+러스트 코드의 실행 흐름을 제어하도록 해주는 가장 일반적인 재료는 `if` 표현식과 `반복문`입니다.
+
+## if 표현식
+
+```rs
+fn main() {
+    let number = 3;
+
+    if number < 5 {
+        println!("condition was true");
+    } else {
+        println!("condition was false");
+    }
+}
+```
+
+
+또한 이 코드의 조건식이 반드시 bool 이어야 한다는 점을 주목할 가치가 있습니다. 조건식이 bool이 아니면 에러가 발생합니다. 예를 들자면 아래 코드를 실행해보세요:
+
+```rs
+fn main() {
+    let number = 3;
+
+    if number {
+        println!("number was three");
+    }
+}
+```
+
+이 경우에는 if 조건식의 결과가 3이고, 러스트는 에러를 발생시킵니다.
+```shell
+$ cargo run
+   Compiling branches v0.1.0 (file:///projects/branches)
+error[E0308]: mismatched types
+ --> src/main.rs:4:8
+  |
+4 |     if number {
+  |        ^^^^^^ expected `bool`, found integer
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `branches` due to previous error
+```
+
+
+if문에는 항상 명시적으로 부울린 타입의 조건식을 제공해야 합니다.
+
+
+## else if로 여러 조건식 다루기
+
+if와 else 사이에 else if를 조합하면 여러 조건식을 사용할 수 있습니다. 예를 들면:
+
+```rs
+fn main() {
+    let number = 6;
+
+    if number % 4 == 0 {
+        println!("number is divisible by 4");
+    } else if number % 3 == 0 {
+        println!("number is divisible by 3");
+    } else if number % 2 == 0 {
+        println!("number is divisible by 2");
+    } else {
+        println!("number is not divisible by 4, 3, or 2");
+    }
+}
+```
+이 프로그램을 실행하면 각각의 if 표현식을 순차적으로 검사하고 조건이 참일 때의 첫 번째 본문을 실행합니다.
+
+6이 2로 나누어 떨어지지만 number is divisible by 2나 number is not divisible by 4, 3, or 2와 같은 else 블록의 텍스트가 출력되지 않는다는 점을 주목하세요.
+
+이는 러스트가 처음으로 true인 조건의 본문을 실행하고나면 나머지는 검사도 하지 않기 때문입니다.
+
+## let 구문에서 if 사용하기
+
+if는 표현식이기 때문에 예제 3-2처럼 변수에 결과를 할당하기 위하여 let 구문의 우변에 사용할 수 있습니다.
+
+```rs
+fn main() {
+    let condition = true;
+    let number = if condition { 5 } else { 6 };
+
+    println!("The value of number is: {number}");
+}
+```
+
+코드 블록은 블록 안의 마지막 표현식을 계산하고, 숫자는 그 자체로 표현식임을 기억하세요.
+
+위의 경우 전체 if 표현식의 값은 실행되는 코드 블록에 따라 결정됩니다. 그렇기에 if 표현식의 각 갈래의 결괏값은 같은 타입이어야 합니다.
+```rs
+fn main() {
+    let condition = true;
+
+    let number = if condition { 5 } else { "six" };
+
+    println!("The value of number is: {number}");
+}
+```
+이 코드를 컴파일하려고 하면 에러가 발생합니다. if와 else 갈래 값의 타입이 호환되지 않고, 러스트는 프로그램의 어느 지점에 문제가 있는지 정확히 알려줍니다:
+```shell
+$ cargo run
+   Compiling branches v0.1.0 (file:///projects/branches)
+error[E0308]: `if` and `else` have incompatible types
+ --> src/main.rs:4:44
+  |
+4 |     let number = if condition { 5 } else { "six" };
+  |                                 -          ^^^^^ expected integer, found `&str`
+  |                                 |
+  |                                 expected because of this
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `branches` due to previous error
+```
+
+if 블록은 정숫값을 계산하는 표현식이고 else 블록은 문자열로 평가되는 표현식입니다.
+
+이런 형태의 코드가 동작하지 않는 이유는 변수가 가질 수 있는 타입이 오직 하나이기 때문입니다.
+
+러스트에서는 number의 타입이 런타임에 정의되도록 할 수 없습니다;
+
+컴파일러가 어떤 변수에 대해 여러 타입에 대한 가정값을 추적해야 한다면 컴파일러는 더 복잡해지고 보장할 수 있는 것들이 줄어들 것입니다.
+
+## 반복문을 이용한 반복
+
+코드 블록을 한 번 이상 수행하는 일은 자주 쓰입니다.
+
+반복 작업을 위해서, 러스트는 몇 가지 반복문 (loop) 을 제공하는데 이는 루프 본문의 시작부터 끝까지 수행한 뒤 다시 처음부터 수행합니다.
+
+반복문을 실험해보기 위해 loops라는 이름의 새 프로젝트를 만듭시다.
+
+러스트에는 loop, while, 그리고 for라는 세 종류의 반복문이 있습니다. 하나씩 써봅시다.
+
+### loop 로 코드 반복하기
+
+```rs
+fn main() {
+    loop {
+        println!("again!");
+    }
+}
+```
+
+
+이 프로그램을 실행시키면, 우리가 프로그램을 강제로 정지시키기 전까지 again!이 계속 반복적으로 출력되는 것을 보게 됩니다.
+
+
+다행히 러스트에서는 코드를 사용하여 루프에서 벗어나는 방법도 제공합니다.
+
+루프 안에 `break` 키워드를 집어넣으면 루프를 멈춰야 하는 시점을 프로그램에게 알려줄 수 있습니다. 
+
+추리 게임에서는 `continue`도 사용했었는데, 이는 프로그램에게 이번 회차에서 루프에 남은 코드를 넘겨버리고 다음 회차로 넘어가라고 알려줍니다.
+
+
+### 반복문에서 값 반환하기
+
+loop의 용례 중 하나는 어떤 스레드가 실행 완료되었는지 검사하는 등 실패할지도 모르는 연산을 재시도할 때입니다. 
+
+여기서 해당 연산의 결과를 이후의 코드에 전달하고 싶을 수도 있습니다.
+
+이를 위해서는 루프 정지를 위해 사용한 break 표현식 뒤에 반환하고자 하는 값을 넣으면 됩니다;
+
+해당 값은 아래와 같이 반복문 밖으로 반환되여 사용 가능하게 됩니다:
+
+```rs
+fn main() {
+    let mut counter = 0;
+
+    let result = loop {
+        counter += 1;
+
+        if counter == 10 {
+            break counter * 2;
+        }
+    };
+
+    println!("The result is {result}");
+}
+```
+
+### 루프 라벨로 여러 반복문 사이에 모호함 없애기
+
+만일 루프 안에 루프가 있다면, break와 continue는 해당 지점의 바로 바깥쪽 루프에 적용됩니다.
+
+루프에 `루프 라벨 (loop label)` 을 추가적으로 명시하면 break나 continue와 함께 이 키워드들이 바로 바깥쪽 루프 대신 라벨이 적힌 특정한 루프에 적용되도록 할 수 있습니다.
+
+루프 라벨은 반드시 `작은 따옴표`로 시작해야 합니다. 아래에 루프가 두 개 중첩된 예제가 있습니다
+
+```rs
+fn main() {
+    let mut count = 0;
+    'counting_up: loop {
+        println!("count = {count}");
+        let mut remaining = 10;
+
+        loop {
+            println!("remaining = {remaining}");
+            if remaining == 9 {
+                break;
+            }
+            if count == 2 {
+                break 'counting_up;
+            }
+            remaining -= 1;
+        }
+
+        count += 1;
+    }
+    println!("End count = {count}");
+}
+```
+
+바깥쪽 루프는 'counting_up 이라는 라벨이 붙어있고, 0에서부터 2까지 카운트합니다.
+
+라벨이 없는 안쪽 루프는 10에서 9까지 거꾸로 카운트합니다.
+
+라벨이 명시되지 않은 첫 번째 break는 안쪽 루프만 벗어납니다.
+
+`break 'counting_up;` 구문은 바깥쪽 루프를 탈출할 것입니다. 이 코드는 다음을 출력합니다:
+
+```shell
+$ cargo run
+   Compiling loops v0.1.0 (file:///projects/loops)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.58s
+     Running `target/debug/loops`
+count = 0
+remaining = 10
+remaining = 9
+count = 1
+remaining = 10
+remaining = 9
+count = 2
+remaining = 10
+End count = 2
+```
+
+### while을 이용한 조건 반복문
+
+조건문이 true인 동안에는 계속 반복하는 형태죠.
+
+조건문이 true가 아니게 될 때 프로그램은 break를 호출하여 반복을 종료합니다.
+
+이러한 반복문 형태는 loop, if, else와 break의 조합으로 구현할 수 있습니다;
+
+여러분이 원하신다면 그렇게 시도해볼 수 있습니다.
+
+하지만 이러한 패턴은 매우 흔하기 때문에 러스트에서는 while 반복문이라 일컫는 구조가 내장되어 있습니다.
+
+```rs
+fn main() {
+    let mut number = 3;
+
+    while number != 0 {
+        println!("{number}!");
+
+        number -= 1;
+    }
+
+    println!("LIFTOFF!!!");
+}
+```
+
+
+### for를 이용한 컬렉션에 대한 반복문
+
+while를 사용하여 배열과 같은 컬렉션의 각 요소에 대한 반복문을 작성할 수 있습니다.
+
+한 가지 예로 예제 3-4의 반복문은 a라는 배열의 각 요소를 출력합니다.
+
+```rs
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+    let mut index = 0;
+
+    while index < 5 {
+        println!("the value is: {}", a[index]);
+
+        index += 1;
+    }
+}
+```
+
+하지만 이런 접근 방식은 에러가 발생하기 쉽습니다;
+
+즉 인덱스의 길이가 부정확하면 패닉을 발생시키는 프로그램이 될 수 있습니다.
+
+예를 들어, a 배열이 네 개의 요소를 갖도록 정의 부분을 변경했는데 while index < 4의 조건문을 고치는걸 잊어버린다면 코드는 패닉을 일으킬 것입니다.
+
+또한 컴파일러가 루프의 매 반복 회차마다 인덱스가 범위 안에 있는지에 대한 조건문 검사를 수행하는 코드를 붙이기 때문에 느려집니다.
+
+좀 더 간편한 대안으로 for 반복문을 사용하여 컬렉션의 각 아이템에 대하여 임의의 코드를 수행시킬 수 있습니다. for 반복문은 예제 3-5의 코드처럼 생겼습니다.
+
+```rs
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+
+    for element in a {
+        println!("the value is: {element}");
+    }
+}
+```
+
+
+이 코드를 실행하면 예제 3-4의 결과와 동일한 결과를 보게 됩니다.
+
+그보다 더 중요한 것은 이렇게 함으로써 코드의 안전성이 강화되고 배열의 끝을 넘어서거나 끝까지 가지 못해서 몇 개의 아이템을 놓쳐서 발생할 수도 있는 버그의 가능성을 제거했다는 것입니다.
+
+
+for 루프를 사용하면 여러분이 배열 내 값의 개수를 변경시키더라도 수정해야 할 다른 코드를 기억해둘 필요가 없어질 겁니다.
+
+
+
+이러한 안전성과 간편성 덕분에 for 반복문은 러스트에서 가장 흔하게 사용되는 반복문 구성요소가 되었습니다.
+
+심지어 while 반복문을 사용했던 예제 3-3의 카운트다운 예제처럼 어떤 코드를 몇 번 정도 반복하고 싶은 경우라도, 대부분의 러스타시안들은 for 반복문을 이용할 겁니다.
+
+표준 라이브러리가 제공하는 Range 타입을 이용하면 특정 횟수만큼의 반복문을 구현할 수 있는데, 
+
+Range는 어떤 숫자에서 시작하여 다른 숫자 종료 전까지의 모든 숫자를 차례로 생성해줍니다.
+
+```rs
+fn main() {
+    for number in (1..4).rev() {
+        println!("{number}!");
+    }
+    println!("LIFTOFF!!!");
+}
+```
+
+정리
+해냈군요! 정말 긴 장이었습니다: 여러분은 변수, 스칼라 타입 및 복합 타입, 함수, 주석, if 표현식, 그리고 루프에 대해 배웠습니다! 이 장에서 다룬 개념들을 연습하고 싶다면 아래 프로그램 만들기에 도전해보세요:
+
+화씨 온도와 섭씨 온도 간 변환하기
+n번째 피보나치 수 생성하기
+크리스마시 캐롤 ‘The Twelve Days of Christmas’ 노래의 반복성을 활용하여 가사 출력해보기
